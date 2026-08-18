@@ -1,0 +1,25 @@
+name: Deploy Static Site to Yandex Cloud
+
+on:
+  push:
+    branches: [main]
+  
+jobs: 
+  deploy:
+    runs-on: ubuntu-latest
+  
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: $ {{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/html
+            git pull origin main
+            sudo systemctl reload nginx
+            echo "Deployed successfully at $(date)"
